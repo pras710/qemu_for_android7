@@ -38,6 +38,8 @@ android_display_producer_check(void *opaque)
      */
     (void)opaque;
     vga_hw_update();
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 static void
@@ -45,6 +47,8 @@ android_display_producer_invalidate(void *opaque)
 {
     (void)opaque;
     vga_hw_invalidate();
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 /* QFrameBuffer client callbacks */
@@ -57,6 +61,8 @@ android_display_update(DisplayState *ds, int x, int y, int w, int h)
 {
     QFrameBuffer* qfbuff = ds->opaque;
     qframebuffer_update(qfbuff, x, y, w, h);
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 static void
@@ -64,6 +70,8 @@ android_display_resize(DisplayState *ds)
 {
     QFrameBuffer* qfbuff = ds->opaque;
     qframebuffer_rotate(qfbuff, 0);
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 static void
@@ -71,6 +79,8 @@ android_display_refresh(DisplayState *ds)
 {
     QFrameBuffer* qfbuff = ds->opaque;
     qframebuffer_poll(qfbuff);
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 }
 
 
@@ -100,4 +110,6 @@ void android_display_init(DisplayState* ds, QFrameBuffer* qf)
     dcl->dpy_text_cursor = NULL;
 
     register_displaychangelistener(ds, dcl);
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 }

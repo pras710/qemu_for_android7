@@ -634,8 +634,8 @@ static void load_linux(hwaddr option_rom,
 #if 0
     fprintf(stderr, "header magic: %#x\n", ldl_p(header+0x202));
 #endif
-    if (ldl_p(header+0x202) == 0x53726448)
-	protocol = lduw_p(header+0x206);
+    if (ldl_p(header+0x202, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED) == 0x53726448)
+	protocol = lduw_p(header+0x206, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
     else
 	protocol = 0;
 
@@ -668,7 +668,7 @@ static void load_linux(hwaddr option_rom,
 
     /* highest address for loading the initrd */
     if (protocol >= 0x203)
-	initrd_max = ldl_p(header+0x22c);
+	initrd_max = ldl_p(header+0x22c, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
     else
 	initrd_max = 0x37ffffff;
 
@@ -679,10 +679,10 @@ static void load_linux(hwaddr option_rom,
     pstrcpy_targphys("cmdline", cmdline_addr, 4096, kernel_cmdline);
 
     if (protocol >= 0x202) {
-	stl_p(header+0x228, cmdline_addr);
+	stl_p(header+0x228, cmdline_addr, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
     } else {
-	stw_p(header+0x20, 0xA33F);
-	stw_p(header+0x22, cmdline_addr-real_addr);
+	stw_p(header+0x20, 0xA33F, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
+	stw_p(header+0x22, cmdline_addr-real_addr, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
     }
 
     /* loader type */
@@ -695,7 +695,7 @@ static void load_linux(hwaddr option_rom,
     /* heap */
     if (protocol >= 0x201) {
 	header[0x211] |= 0x80;	/* CAN_USE_HEAP */
-	stw_p(header+0x224, cmdline_addr-real_addr-0x200);
+	stw_p(header+0x224, cmdline_addr-real_addr-0x200, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
     }
 
     /* load initrd */
@@ -723,8 +723,8 @@ static void load_linux(hwaddr option_rom,
 	}
 	fclose(fi);
 
-	stl_p(header+0x218, initrd_addr);
-	stl_p(header+0x21c, initrd_size);
+	stl_p(header+0x218, initrd_addr, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
+	stl_p(header+0x21c, initrd_size, /*pras*/OTHER_TARGET_NOT_IMPLEMENTED);
     }
 
     /* store the finalized header and load the rest of the kernel */

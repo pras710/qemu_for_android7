@@ -3,6 +3,8 @@
 
 #include "qemu-common.h"
 
+//pras
+#include "gemdroid-tracer.h"
 #include "hw/qdev.h"
 
 /* PCI includes legacy ISA access.  */
@@ -214,25 +216,25 @@ pci_get_byte(const uint8_t *config)
 static inline void
 pci_set_word(uint8_t *config, uint16_t val)
 {
-    stw_le_p(config, val);
+    stw_le_p(config, val, /*pras*/MEM_REQ_PCI_HW);
 }
 
 static inline uint16_t
 pci_get_word(const uint8_t *config)
 {
-    return lduw_le_p(config);
+    return lduw_le_p(config, /*pras*/MEM_REQ_PCI_HW);
 }
 
 static inline void
 pci_set_long(uint8_t *config, uint32_t val)
 {
-    stl_le_p(config, val);
+    stl_le_p(config, val, /*pras*/MEM_REQ_PCI_HW);
 }
 
 static inline uint32_t
 pci_get_long(const uint8_t *config)
 {
-    return ldl_le_p(config);
+    return ldl_le_p(config, /*pras*/MEM_REQ_PCI_HW);
 }
 
 static inline void

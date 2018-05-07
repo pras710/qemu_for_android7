@@ -15,6 +15,8 @@
 #include "sysemu/kvm.h"
 #endif
 
+//pras
+#include "gemdroid-tracer.h"
 
 // Both safe_memory_rw_debug and safe_get_phys_page_debug need to translate
 // virtual addresses to physical addresses. When running on KVM we need to
@@ -34,7 +36,7 @@ int safe_memory_rw_debug(CPUState *cpu, target_ulong addr, uint8_t *buf,
         kvm_get_sregs(cpu);
     }
 #endif
-    return cpu_memory_rw_debug(cpu, addr, buf, len, is_write);
+    return cpu_memory_rw_debug(cpu, addr, buf, len, is_write, /*pras*/MEM_REQ_VMEM);
 }
 
 hwaddr safe_get_phys_page_debug(CPUState *cpu, target_ulong addr)

@@ -504,7 +504,7 @@ static inline void ne2000_mem_writew(NE2000State *s, uint32_t addr,
     addr &= ~1; /* XXX: check exact behaviour if not even */
     if (addr < 32 ||
         (addr >= NE2000_PMEM_START && addr < NE2000_MEM_SIZE)) {
-        stw_le_p(s->mem + addr, val);
+        stw_le_p(s->mem + addr, val, /*pras*/MEM_REQ_NET);
     }
 }
 
@@ -514,7 +514,7 @@ static inline void ne2000_mem_writel(NE2000State *s, uint32_t addr,
     addr &= ~1; /* XXX: check exact behaviour if not even */
     if (addr < 32 ||
         (addr >= NE2000_PMEM_START && addr < NE2000_MEM_SIZE)) {
-        stl_le_p(s->mem + addr, val);
+        stl_le_p(s->mem + addr, val, /*pras*/MEM_REQ_NET);
     }
 }
 
@@ -533,7 +533,7 @@ static inline uint32_t ne2000_mem_readw(NE2000State *s, uint32_t addr)
     addr &= ~1; /* XXX: check exact behaviour if not even */
     if (addr < 32 ||
         (addr >= NE2000_PMEM_START && addr < NE2000_MEM_SIZE)) {
-        return lduw_le_p(s->mem + addr);
+        return lduw_le_p(s->mem + addr, /*pras*/MEM_REQ_NET);
     } else {
         return 0xffff;
     }
@@ -544,7 +544,7 @@ static inline uint32_t ne2000_mem_readl(NE2000State *s, uint32_t addr)
     addr &= ~1; /* XXX: check exact behaviour if not even */
     if (addr < 32 ||
         (addr >= NE2000_PMEM_START && addr < NE2000_MEM_SIZE)) {
-        return ldl_le_p(s->mem + addr);
+        return ldl_le_p(s->mem + addr, /*pras*/MEM_REQ_NET);
     } else {
         return 0xffffffff;
     }

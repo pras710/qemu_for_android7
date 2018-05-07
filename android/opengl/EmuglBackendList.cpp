@@ -9,6 +9,8 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
+#include<stdio.h>
+
 #include "android/opengl/EmuglBackendList.h"
 
 #include "android/base/Log.h"
@@ -35,6 +37,8 @@ using android::base::System;
 EmuglBackendList::EmuglBackendList(const char* execDir,
                                    int hostBitness) :
         mDefaultName("auto"), mNames(), mHostBitness(0), mExecDir(execDir) {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     // Fix host bitness if needed.
     if (!hostBitness) {
         hostBitness = System::kProgramBitness;
@@ -45,6 +49,8 @@ EmuglBackendList::EmuglBackendList(const char* execDir,
 }
 
 bool EmuglBackendList::contains(const char* name) const {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     for (size_t n = 0; n < mNames.size(); ++n) {
         if (mNames[n] == name) {
             return true;
@@ -54,6 +60,8 @@ bool EmuglBackendList::contains(const char* name) const {
 }
 
 String EmuglBackendList::getLibDirPath(const char* name) {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     return android::base::StringFormat(
             "%s/%s/gles_%s",
             mExecDir.c_str(),
@@ -64,6 +72,8 @@ String EmuglBackendList::getLibDirPath(const char* name) {
 bool EmuglBackendList::getBackendLibPath(const char* name,
                                          Library library,
                                          String* libPath) {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
 #ifdef _WIN32
     static const char kLibPrefix[] = "";
 #else

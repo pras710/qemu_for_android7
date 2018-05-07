@@ -24,6 +24,8 @@
 #include "exec/cpu-common.h"
 #include "exec/cpu-all.h"
 
+//pras
+#include "gemdroid-tracer.h"
 /* allow to see translation results - the slowdown should be negligible, so we leave it */
 #define DEBUG_DISAS
 
@@ -181,6 +183,9 @@ struct TranslationBlock {
     struct TranslationBlock *jmp_next[2];
     struct TranslationBlock *jmp_first;
     uint32_t icount;
+	/*pras*/
+	int print_data_flag;
+	//uint32_t pid_of_code;
 };
 
 #include "exec/spinlock.h"
@@ -360,10 +365,10 @@ extern void *io_mem_opaque[IO_MEM_NB_ENTRIES];
 void tlb_fill(CPUArchState *env1, target_ulong addr, int is_write, int mmu_idx,
               uintptr_t retaddr);
 
-uint8_t helper_ldb_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx);
-uint16_t helper_ldw_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx);
-uint32_t helper_ldl_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx);
-uint64_t helper_ldq_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx);
+uint8_t helper_ldb_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx , /*pras*/MEM_REQ_ORIGIN mem_origin);
+uint16_t helper_ldw_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx , /*pras*/MEM_REQ_ORIGIN mem_origin);
+uint32_t helper_ldl_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx , /*pras*/MEM_REQ_ORIGIN mem_origin);
+uint64_t helper_ldq_cmmu(CPUArchState *env, target_ulong addr, int mmu_idx , /*pras*/MEM_REQ_ORIGIN mem_origin);
 
 #define ACCESS_TYPE (NB_MMU_MODES + 1)
 #define MEMSUFFIX _code

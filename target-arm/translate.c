@@ -101,6 +101,10 @@ static TCGv_i64 cpu_F0d, cpu_F1d;
 
 #include "exec/gen-icount.h"
 
+//GemDroid added
+//For GemDroid Tracer Functionality
+#include "gemdroid-tracer.h"
+//GemDroid end
 static const char *regnames[] =
     { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
       "r8", "r9", "r10", "r11", "r12", "r13", "r14", "pc" };
@@ -6584,7 +6588,7 @@ static void disas_arm_insn(CPUARMState * env, DisasContext *s)
     TCGv addr;
     TCGv_i64 tmp64;
 
-    insn = cpu_ldl_code(env, s->pc);
+    insn = cpu_ldl_code(env, s->pc, /*pras*/MEM_REQ_TRANSLATE);
 
     s->pc += 4;
 
@@ -7987,7 +7991,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
         /* Fall through to 32-bit decode.  */
     }
 
-    insn = cpu_lduw_code(env, s->pc);
+    insn = cpu_lduw_code(env, s->pc, /*pras*/MEM_REQ_TRANSLATE);
     s->pc += 2;
     insn |= (uint32_t)insn_hw1 << 16;
 
@@ -9019,7 +9023,7 @@ static void disas_thumb_insn(CPUARMState *env, DisasContext *s)
         }
     }
 
-    insn = cpu_lduw_code(env, s->pc);
+    insn = cpu_lduw_code(env, s->pc, /*pras*/MEM_REQ_TRANSLATE);
 
     s->pc += 2;
 
@@ -9972,14 +9976,19 @@ done_generating:
     gen_icount_end(tb, num_insns);
     *tcg_ctx.gen_opc_ptr = INDEX_op_end;
 
-#ifdef DEBUG_DISAS
-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
+//pras comments this : #ifdef DEBUG_DISAS
+    //GemDroid added
+    //GemDroid comments the if condition -- original ARM instructions
+    //if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
+	//printf("tid=%d\n", getMeContextId(env));
+    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) || CPU_tracer) {
+    //GemDroid end
         qemu_log("----------------\n");
         qemu_log("IN: %s\n", lookup_symbol(pc_start));
         log_target_disas(env, pc_start, dc->pc - pc_start, dc->thumb);
         qemu_log("\n");
     }
-#endif
+// pras comments this: #endif
     if (search_pc) {
         j = tcg_ctx.gen_opc_ptr - tcg_ctx.gen_opc_buf;
         lj++;

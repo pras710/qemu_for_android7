@@ -25,6 +25,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//GemDroid added
+//For GemDroid Tracer Functionality
+#include "gemdroid-tracer.h"
+//GemDroid end
+
+
 /* when shrinking, we reduce the pixel ratio by this fixed amount */
 #define  SHRINK_SCALE  0.6
 
@@ -1644,6 +1650,23 @@ skin_window_process_event(SkinWindow*  window, SkinEvent* ev)
                 skin_window_redraw( window, &button->rect );
                 window->button.pressed = button;
                 if(button->keycode) {
+                  	//Gemdroid Added
+                	//If it's one of GemDroid's defined keys, dont do the keys' original
+                	// corresponding actions!
+                	// A better method would be to accept a string of inputs (like a password) to decide what to do.
+                	//Example: 2 presses to Call button, and 2 press to end call triggers recording of device's traces.
+
+                	//Volume Up Button Pressed Action
+                    if(button->keycode == KEY_SEND)
+  					{
+  						if(CPU_tracer== 1)
+  							CPU_tracer=0;
+  						else if(CPU_tracer== 0)
+  							CPU_tracer=1;
+						printf("CPU_tracer=%d\n", CPU_tracer);
+  						break;
+					}
+                    //GemDroid end
                     window->win_funcs->key_event(button->keycode, 1);
                 }
             }

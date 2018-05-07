@@ -21,6 +21,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+//pras
+#include "gemdroid-tracer.h"
 #include "qemu/timer.h"
 
 #define DATA_SIZE (1 << SHIFT)
@@ -145,7 +147,7 @@ static inline DATA_TYPE glue(io_read, SUFFIX)(CPUArchState *env,
 static __attribute__((unused))
 #endif
 WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
-                            uintptr_t retaddr)
+                            uintptr_t retaddr, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
     int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
     target_ulong tlb_addr = env->tlb_table[mmu_idx][index].ADDR_READ;
@@ -197,8 +199,8 @@ WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
         addr2 = addr1 + DATA_SIZE;
         /* Note the adjustment at the beginning of the function.
            Undo that for the recursion.  */
-        res1 = helper_le_ld_name(env, addr1, mmu_idx, retaddr + GETPC_ADJ);
-        res2 = helper_le_ld_name(env, addr2, mmu_idx, retaddr + GETPC_ADJ);
+        res1 = helper_le_ld_name(env, addr1, mmu_idx, retaddr + GETPC_ADJ, /*pras*/mem_req);
+        res2 = helper_le_ld_name(env, addr2, mmu_idx, retaddr + GETPC_ADJ, /*pras*/mem_req);
         shift = (addr & (DATA_SIZE - 1)) * 8;
 
         /* Little-endian combine.  */
@@ -215,9 +217,9 @@ WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
 
     haddr = addr + env->tlb_table[mmu_idx][index].addend;
 #if DATA_SIZE == 1
-    res = glue(glue(ld, LSUFFIX), _p)((uint8_t *)haddr);
+    res = glue(glue(ld, LSUFFIX), _p)((uint8_t *)haddr, /*pras*/mem_req);
 #else
-    res = glue(glue(ld, LSUFFIX), _le_p)((uint8_t *)haddr);
+    res = glue(glue(ld, LSUFFIX), _le_p)((uint8_t *)haddr, /*pras*/mem_req);
 #endif
     return res;
 }
@@ -227,7 +229,7 @@ WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
 static __attribute__((unused))
 #endif
 WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
-                            uintptr_t retaddr)
+                            uintptr_t retaddr, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
     int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
     target_ulong tlb_addr = env->tlb_table[mmu_idx][index].ADDR_READ;
@@ -279,8 +281,8 @@ WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
         addr2 = addr1 + DATA_SIZE;
         /* Note the adjustment at the beginning of the function.
            Undo that for the recursion.  */
-        res1 = helper_be_ld_name(env, addr1, mmu_idx, retaddr + GETPC_ADJ);
-        res2 = helper_be_ld_name(env, addr2, mmu_idx, retaddr + GETPC_ADJ);
+        res1 = helper_be_ld_name(env, addr1, mmu_idx, retaddr + GETPC_ADJ, /*pras*/mem_req);
+        res2 = helper_be_ld_name(env, addr2, mmu_idx, retaddr + GETPC_ADJ, /*pras*/mem_req);
         shift = (addr & (DATA_SIZE - 1)) * 8;
 
         /* Big-endian combine.  */
@@ -296,16 +298,16 @@ WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
 #endif
 
     haddr = addr + env->tlb_table[mmu_idx][index].addend;
-    res = glue(glue(ld, LSUFFIX), _be_p)((uint8_t *)haddr);
+    res = glue(glue(ld, LSUFFIX), _be_p)((uint8_t *)haddr, /*pras*/mem_req);
     return res;
 }
 #endif /* DATA_SIZE > 1 */
 
 DATA_TYPE
 glue(glue(helper_ld, SUFFIX), MMUSUFFIX)(CPUArchState *env, target_ulong addr,
-                                         int mmu_idx)
+                                         int mmu_idx, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
-    return helper_te_ld_name (env, addr, mmu_idx, GETRA());
+    return helper_te_ld_name (env, addr, mmu_idx, GETRA(), /*pras*/mem_req);
 }
 
 #ifndef SOFTMMU_CODE_ACCESS
@@ -314,16 +316,16 @@ glue(glue(helper_ld, SUFFIX), MMUSUFFIX)(CPUArchState *env, target_ulong addr,
    avoid this for 64-bit data, or for 32-bit data on 32-bit host.  */
 #if DATA_SIZE * 8 < TCG_TARGET_REG_BITS
 WORD_TYPE helper_le_lds_name(CPUArchState *env, target_ulong addr,
-                             int mmu_idx, uintptr_t retaddr)
+                             int mmu_idx, uintptr_t retaddr, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
-    return (SDATA_TYPE)helper_le_ld_name(env, addr, mmu_idx, retaddr);
+    return (SDATA_TYPE)helper_le_ld_name(env, addr, mmu_idx, retaddr, /*pras*/mem_req);
 }
 
 # if DATA_SIZE > 1
 WORD_TYPE helper_be_lds_name(CPUArchState *env, target_ulong addr,
-                             int mmu_idx, uintptr_t retaddr)
+                             int mmu_idx, uintptr_t retaddr, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
-    return (SDATA_TYPE)helper_be_ld_name(env, addr, mmu_idx, retaddr);
+    return (SDATA_TYPE)helper_be_ld_name(env, addr, mmu_idx, retaddr, /*pras*/mem_req);
 }
 # endif
 #endif
@@ -357,7 +359,7 @@ static inline void glue(io_write, SUFFIX)(CPUArchState *env,
 }
 
 void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-                       int mmu_idx, uintptr_t retaddr)
+                       int mmu_idx, uintptr_t retaddr, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
     int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
     target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
@@ -411,7 +413,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
             /* Note the adjustment at the beginning of the function.
                Undo that for the recursion.  */
             glue(helper_ret_stb, MMUSUFFIX)(env, addr + i, val8,
-                                            mmu_idx, retaddr + GETPC_ADJ);
+                                            mmu_idx, retaddr + GETPC_ADJ, /*pras*/mem_req);
         }
         return;
     }
@@ -425,15 +427,15 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
 
     haddr = addr + env->tlb_table[mmu_idx][index].addend;
 #if DATA_SIZE == 1
-    glue(glue(st, SUFFIX), _p)((uint8_t *)haddr, val);
+    glue(glue(st, SUFFIX), _p)((uint8_t *)haddr, val, /*pras*/mem_req);
 #else
-    glue(glue(st, SUFFIX), _le_p)((uint8_t *)haddr, val);
+    glue(glue(st, SUFFIX), _le_p)((uint8_t *)haddr, val, /*pras*/mem_req);
 #endif
 }
 
 #if DATA_SIZE > 1
 void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-                       int mmu_idx, uintptr_t retaddr)
+                       int mmu_idx, uintptr_t retaddr, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
     int index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
     target_ulong tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
@@ -487,7 +489,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
             /* Note the adjustment at the beginning of the function.
                Undo that for the recursion.  */
             glue(helper_ret_stb, MMUSUFFIX)(env, addr + i, val8,
-                                            mmu_idx, retaddr + GETPC_ADJ);
+                                            mmu_idx, retaddr + GETPC_ADJ, /*pras*/mem_req);
         }
         return;
     }
@@ -500,15 +502,15 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
 #endif
 
     haddr = addr + env->tlb_table[mmu_idx][index].addend;
-    glue(glue(st, SUFFIX), _be_p)((uint8_t *)haddr, val);
+    glue(glue(st, SUFFIX), _be_p)((uint8_t *)haddr, val, /*pras*/mem_req);
 }
 #endif /* DATA_SIZE > 1 */
 
 void
 glue(glue(helper_st, SUFFIX), MMUSUFFIX)(CPUArchState *env, target_ulong addr,
-                                         DATA_TYPE val, int mmu_idx)
+                                         DATA_TYPE val, int mmu_idx, /*pras*/MEM_REQ_ORIGIN mem_req)
 {
-    helper_te_st_name(env, addr, val, mmu_idx, GETRA());
+    helper_te_st_name(env, addr, val, mmu_idx, GETRA(), /*pras*/mem_req);
 }
 
 #endif /* !defined(SOFTMMU_CODE_ACCESS) */

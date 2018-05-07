@@ -151,6 +151,7 @@
 #undef ACCESS_TYPE
 #undef MEMSUFFIX
 
+//pras adds the , req for all these defines...
 #define ldub(p) ldub_data(p)
 #define ldsb(p) ldsb_data(p)
 #define lduw(p) lduw_data(p)

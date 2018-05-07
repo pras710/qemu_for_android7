@@ -21,6 +21,10 @@
 #include "exec/softmmu_exec.h"
 #include "exec/code-profile.h"
 
+//GemDroid added
+#include "gemdroid-tracer.h"
+//GemDroid end
+
 /* Set to 1 to debug tracing */
 #define DEBUG   0
 
@@ -74,7 +78,7 @@ static size_t get_guest_kernel_string(char* qemu_str,
     if (qemu_buffer_size > 1) {
         for (copied = 0; copied < qemu_buffer_size - 1; copied++) {
             qemu_str[copied] = cpu_ldub_kernel(cpu_single_env,
-                                               guest_str + copied);
+                                               guest_str + copied, MEM_REQ_CONTEXT_SWITCH);
             if (qemu_str[copied] == '\0') {
                 return copied;
             }
@@ -97,6 +101,10 @@ static void trace_dev_write(void *opaque, hwaddr offset, uint32_t value)
         if (trace_filename != NULL) {
             D("QEMU.trace: kernel, context switch %u\n", value);
         }
+ 
+        //GemDroid added
+        current_pid = value;
+        //GemDroid end
         tid = (unsigned) value;
         break;
     case TRACE_DEV_REG_TGID:    // save the tgid for the following fork/clone
@@ -143,6 +151,22 @@ static void trace_dev_write(void *opaque, hwaddr offset, uint32_t value)
         if (trace_filename != NULL) {
             D("QEMU.trace: kernel, execve [%.*s]\n", cmdlen, exec_arg);
         }
+		//GemDroid added
+        memcpy(current_pid_path, exec_arg, cmdlen);
+
+		// Cut first argument off the entire command line.
+        int n;
+		for (n = 0; n < cmdlen; n++) {
+			if (current_pid_path[n] == ' ') {
+				break;
+			}
+		}
+		current_pid_path[n] = '\0';
+		if (CPU_tracer)
+			printf("PROCESS %d created with path %s\n",current_pid, current_pid_path);
+		//GemDroid end
+		//GemDroid end
+
 #if DEBUG || DEBUG_PID
         if (trace_filename != NULL) {
             int i;

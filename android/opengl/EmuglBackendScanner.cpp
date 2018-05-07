@@ -9,6 +9,8 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
+#include<stdio.h>
+
 #include "android/opengl/EmuglBackendScanner.h"
 
 #include "android/base/Log.h"
@@ -32,6 +34,8 @@ StringVector EmuglBackendScanner::scanDir(const char* execDir,
                                           int hostBitness) {
     StringVector names;
 
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     if (!execDir || !System::get()->pathExists(execDir)) {
         LOG(ERROR) << "Invalid executable directory: " << execDir;
         return names;

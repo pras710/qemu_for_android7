@@ -95,6 +95,8 @@ static MTSState _MTSState = { 0 };
 static void
 _push_event(int type, int code, int value)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     user_event_generic(type, code, value);
 }
 
@@ -107,6 +109,8 @@ _push_event(int type, int code, int value)
 static int
 _mtsstate_get_pointer_index(const MTSState* mts_state, int tracking_id)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     int index;
     for (index = 0; index < MTS_POINTERS_NUM; index++) {
         if (mts_state->tracked_pointers[index].tracking_id == tracking_id) {
@@ -124,6 +128,8 @@ _mtsstate_get_pointer_index(const MTSState* mts_state, int tracking_id)
 static int
 _mtsstate_get_available_pointer_index(const MTSState* mts_state)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     return _mtsstate_get_pointer_index(mts_state, MTS_POINTER_UP);
 }
 
@@ -137,6 +143,8 @@ _mtsstate_get_available_pointer_index(const MTSState* mts_state)
 static void
 _mts_pointer_down(MTSState* mts_state, int tracking_id, int x, int y, int pressure)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     /* Get first available slot for the new pointer. */
     const int slot_index = _mtsstate_get_available_pointer_index(mts_state);
 
@@ -175,6 +183,8 @@ _mts_pointer_down(MTSState* mts_state, int tracking_id, int x, int y, int pressu
 static void
 _mts_pointer_up(MTSState* mts_state, int slot_index)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     /* Make sure that correct slot is selected. */
     if (slot_index != mts_state->current_slot) {
         _push_event(EV_ABS, ABS_MT_SLOT, slot_index);
@@ -207,6 +217,8 @@ _mts_pointer_up(MTSState* mts_state, int slot_index)
 static void
 _mts_pointer_move(MTSState* mts_state, int slot_index, int x, int y, int pressure)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSPointerState* ptr_state = &mts_state->tracked_pointers[slot_index];
 
     /* Make sure that coordinates have really changed. */
@@ -249,6 +261,8 @@ static int _is_mt_initialized = 0;
 static AsyncIOAction
 _on_fb_sent(void* opaque, SDKCtlDirectPacket* packet, AsyncIOState status)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSState* const mts_state = (MTSState*)opaque;
 
     if (status == ASIO_STATE_SUCCEEDED) {
@@ -275,6 +289,8 @@ _on_fb_sent(void* opaque, SDKCtlDirectPacket* packet, AsyncIOState status)
 static void
 _mt_fb_common_update(MTSState* mts_state, int x, int y, int w, int h)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     if (mts_state->fb_header.w == 0 && mts_state->fb_header.h == 0) {
         /* First update after previous one has been transmitted to the device. */
         mts_state->fb_header.x = x;
@@ -331,6 +347,8 @@ _mt_fb_common_update(MTSState* mts_state, int x, int y, int w, int h)
 static void
 _mt_fb_update(void* opaque, int x, int y, int w, int h)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSState* const mts_state = (MTSState*)opaque;
     const DisplaySurface* const surface = mts_state->ds->surface;
 
@@ -356,6 +374,8 @@ multitouch_opengles_fb_update(void* context,
                               int format, int type,
                               unsigned char* pixels)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSState* const mts_state = &_MTSState;
 
     /* Make sure MT port is initialized. */
@@ -380,6 +400,8 @@ multitouch_opengles_fb_update(void* context,
 void
 multitouch_refresh_screen(void)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSState* const mts_state = &_MTSState;
 
     /* Make sure MT port is initialized. */
@@ -397,6 +419,8 @@ multitouch_refresh_screen(void)
 void
 multitouch_fb_updated(void)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSState* const mts_state = &_MTSState;
 
     /* This concludes framebuffer update. */
@@ -418,6 +442,8 @@ multitouch_fb_updated(void)
 void
 multitouch_init(AndroidMTSPort* mtsp)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     if (!_is_mt_initialized) {
         MTSState* const mts_state = &_MTSState;
         DisplayState* const ds = get_displaystate();
@@ -469,6 +495,8 @@ multitouch_update_pointer(MTESource source,
                           int y,
                           int pressure)
 {
+	//pras
+	printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     MTSState* const mts_state = &_MTSState;
 
     /* Assign a fixed tracking ID to the mouse pointer. */

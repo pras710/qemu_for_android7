@@ -4,6 +4,7 @@
 
 void cpu_save(QEMUFile *f, void *opaque)
 {
+	printf("pras: qemu prints this: in cpu save\n"); 
     int i;
     CPUARMState *env = (CPUARMState *)opaque;
 
@@ -119,6 +120,7 @@ void cpu_save(QEMUFile *f, void *opaque)
 int cpu_load(QEMUFile *f, void *opaque, int version_id)
 {
     CPUARMState *env = (CPUARMState *)opaque;
+	printf("pras: qemu prints this: in cpu load\n"); 
     int i;
     uint32_t val;
 

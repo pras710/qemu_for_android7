@@ -115,6 +115,8 @@ public:
             unsigned events = mPendingEvents;
             mPendingEvents = 0U;
             mCallback(mOpaque, mFd, events);
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         TAIL_QUEUE_LIST_TRAITS(Traits, FdWatch, mLink);
@@ -125,6 +127,8 @@ public:
             IOHandler* cbWrite = (events & kEventWrite) ? handleWrite : NULL;
             qemu_set_fd_handler(mFd, cbRead, cbWrite, this);
             mWantedEvents = events;
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         void setPending(unsigned event) {
@@ -132,6 +136,8 @@ public:
                 asQemuLooper(mLooper)->addPendingFdWatch(this);
             }
             mPendingEvents |= event;
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         void clearPending() {
@@ -139,18 +145,24 @@ public:
                 asQemuLooper(mLooper)->delPendingFdWatch(this);
                 mPendingEvents = 0;
             }
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         // Called by QEMU on a read i/o event. |opaque| is a FdWatch handle.
         static void handleRead(void* opaque) {
             FdWatch* watch = static_cast<FdWatch*>(opaque);
             watch->setPending(kEventRead);
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         // Called by QEMU on a write i/o event. |opaque| is a FdWatch handle.
         static void handleWrite(void* opaque) {
             FdWatch* watch = static_cast<FdWatch*>(opaque);
             watch->setPending(kEventWrite);
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         unsigned mWantedEvents;
@@ -162,6 +174,8 @@ public:
                                        BaseFdWatch::Callback callback,
                                        void* opaque) {
         ::android::base::socketSetNonBlocking(fd);
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         return new FdWatch(this, fd, callback, opaque);
     }
 
@@ -179,6 +193,8 @@ public:
                                  SCALE_MS,
                                  callback,
                                  opaque);
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         ~Timer() {
@@ -192,6 +208,8 @@ public:
                 timeout_ms += qemu_clock_get_ms(QEMU_CLOCK_HOST);
                 timer_mod(mTimer, timeout_ms);
             }
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         virtual void startAbsolute(Duration deadline_ms) {
@@ -200,6 +218,8 @@ public:
             } else {
                 timer_mod(mTimer, deadline_ms);
             }
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
         }
 
         virtual void stop() {
@@ -274,6 +294,8 @@ private:
         }
 
         mPendingFdWatches.insertTail(watch);
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     }
 
     void delPendingFdWatch(FdWatch* watch) {
@@ -294,6 +316,8 @@ private:
             looper->delPendingFdWatch(watch);
             watch->fire();
         }
+			//pras
+			printf("pras debug: %s %s %ld\n", __FILE__, __FUNCTION__, __LINE__);
     }
 
     QEMUBH* mQemuBh;
