@@ -41,6 +41,11 @@
 #include "translate-all.h"
 #include "qemu/timer.h"
 
+//GemDroid added
+//For GemDroid Tracer Functionality
+#include "gemdroid-tracer.h"
+//GemDroid end
+
 //#define DEBUG_TB_INVALIDATE
 //#define DEBUG_FLUSH
 /* make various TB consistency checks */
@@ -151,8 +156,7 @@ int cpu_gen_code(CPUArchState *env, TranslationBlock *tb, int *gen_code_size_ptr
 #endif
     tcg_func_start(s);
 
-    gen_intermediate_code(env, tb);
-
+	gen_intermediate_code(env, tb);
     /* generate machine code */
     gen_code_buf = tb->tc_ptr;
     tb->tb_next_offset[0] = 0xffff;
@@ -184,7 +188,10 @@ int cpu_gen_code(CPUArchState *env, TranslationBlock *tb, int *gen_code_size_ptr
 #endif
 
 #ifdef DEBUG_DISAS
-    if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM)) {
+    //GemDroid added
+    //Print all insts - These are host machine's translated instructions. I.e. as this is my x86 laptop, these are x86 instructions.
+	//if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM)) {
+    if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM)){// commenting to not print x86 insts || (CPU_tracer && matchMeInPidTid(env)))
         qemu_log("OUT: [size=%d]\n", *gen_code_size_ptr);
         log_disas(tb->tc_ptr, *gen_code_size_ptr);
         qemu_log("\n");
@@ -257,6 +264,14 @@ bool cpu_restore_state(CPUArchState *env, uintptr_t retaddr)
 
     tb = tb_find_pc(retaddr);
     if (tb) {
+		//pras
+		if(matchMeInPidTid(env))
+		{
+			printf("from translate-all:272\n");
+		}
+		target_disas(0, env, tb->pc,
+			tb->size, tb->flags);//, matchMeInPidTid(env));//ARM_TBFLAG_THUMB(tb->flags));
+
         cpu_restore_state_from_tb(tb, env, retaddr);
         return true;
     }
@@ -1097,6 +1112,16 @@ void tb_invalidate_phys_page_range(tb_page_addr_t start, tb_page_addr_t end,
                 if (env->mem_io_pc) {
                     /* now we have a real cpu fault */
                     current_tb = tb_find_pc(env->mem_io_pc);
+					//pras
+					if(current_tb)
+					{
+		if(matchMeInPidTid(env))
+		{
+			printf("from translate-all:1120\n");
+		}
+						target_disas(0, env, tb->pc,
+								tb->size, tb->flags);//, matchMeInPidTid(env));//ARM_TBFLAG_THUMB(tb->flags));
+					}
                 }
             }
             if (current_tb == tb &&
@@ -1212,6 +1237,16 @@ static void tb_invalidate_phys_page(tb_page_addr_t addr,
 #ifdef TARGET_HAS_PRECISE_SMC
     if (tb && pc != 0) {
         current_tb = tb_find_pc(pc);
+		//pras
+		if(current_tb)
+		{
+		if(matchMeInPidTid(env))
+		{
+			printf("from translate-all:1245\n");
+		}
+			target_disas(0, env, tb->pc,
+					tb->size, tb->flags);//, matchMeInPidTid(env));//ARM_TBFLAG_THUMB(tb->flags));
+		}
     }
 #endif
     while (tb != NULL) {
@@ -1416,6 +1451,13 @@ void tb_check_watchpoint(CPUArchState *env)
         cpu_abort(env, "check_watchpoint: could not find TB for pc=%p",
                   (void *)env->mem_io_pc);
     }
+	//pras
+		if(matchMeInPidTid(env))
+		{
+			printf("from translate-all:1457\n");
+		}
+	target_disas(0, env, tb->pc,
+			tb->size, tb->flags);//, matchMeInPidTid(env));//ARM_TBFLAG_THUMB(tb->flags));
     cpu_restore_state_from_tb(tb, env, env->mem_io_pc);
     tb_phys_invalidate(tb, -1);
 }
@@ -1464,6 +1506,13 @@ void cpu_io_recompile(CPUArchState *env, uintptr_t retaddr)
         cpu_abort(env, "cpu_io_recompile: could not find TB for pc=%p",
                   (void *)retaddr);
     }
+	//pras
+		if(matchMeInPidTid(env))
+		{
+			printf("from translate-all:1512\n");
+		}
+	target_disas(0, env, tb->pc,
+			tb->size, tb->flags);//, matchMeInPidTid(env));//ARM_TBFLAG_THUMB(tb->flags));
     n = env->icount_decr.u16.low + tb->icount;
     cpu_restore_state_from_tb(tb, env, retaddr);
     /* Calculate how many instructions had been executed before the fault

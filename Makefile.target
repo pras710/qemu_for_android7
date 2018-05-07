@@ -157,6 +157,7 @@ common_LOCAL_SRC_FILES += \
     cpu-exec.c  \
     cputlb.c \
     exec.c \
+    gemdroid-tracer.c \
     main-loop.c \
     memory-android.c \
     monitor-android.c \
